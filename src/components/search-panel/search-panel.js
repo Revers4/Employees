@@ -1,9 +1,9 @@
 import './search-panel.css';
 
-const SearchPanel = ({ searchFilter }) => {
+const SearchPanel = ({ searchEmployees }) => {
 
     return (
-        <input  onChange={(e) => searchFilter(e.target.value)}
+        <input  onChange={(e) => searchEmployees(e.target.value)}
                 type="text"
                 className="form-control search-input"
                 placeholder="Найти сотрудника"/>

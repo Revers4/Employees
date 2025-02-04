@@ -16,7 +16,7 @@ class App extends Component {
         { name: 'Ivan Sidarov', salary: "1500$", like: false, increase: false, id: 2 },
         { name: 'Vova Kryukov', salary: "2000$", like: false, increase: false, id: 3 }
       ],
-      filterBy: "none",
+      filterBy: "all",
       searchBy: ""
     }
     this.newId = 4
@@ -49,48 +49,52 @@ class App extends Component {
     }))
   }
 
-  changeFilter = ( name ) => {
+  filterEmployees = ( filterBy ) => {
     this.setState(() => ({
-      filterBy: name
+      filterBy
     }))
   }
 
-  searchFilter = ( name) =>{
+  searchEmployees = ( searchBy ) =>{
     this.setState(() => ({
-      searchBy: name
+      searchBy
     }))
   }
 
+  /* Поиск по имени */
+  searchArr = ( searchBy, items ) => {
+    if(searchBy.length === 0){
+      return items
+    }
+    return items.filter((employe) => employe.name.toLowerCase().includes(searchBy.toLowerCase()))
+  }
+
+  /* Фильтры */
+  filterArr= ( filterBy, items ) => {
+    if(filterBy === "increase"){
+      return items.filter(employe => employe.increase)
+    } else if(filterBy === "more1000"){
+      return items.filter(employe => +employe.salary.slice(0, -1) > 1000) 
+    } else { return items }
+  }
 
   render() {
     const { data, filterBy, searchBy } = this.state
     const employeesNumber = data.length
     const increaseArr = data.filter((employe) => employe.increase ).length
-    let filteredEmployees = data
 
-    {/* Фильтры */}
-    if(filterBy === "first"){
-      filteredEmployees = filteredEmployees.filter((employe) => employe.increase)
-    } else if(filterBy === "second"){
-      filteredEmployees = filteredEmployees.filter((employe) => +employe.salary.slice(0, -1) > 1000) 
-    }
-
-    {/* Поиск по имени */}
-    if(searchBy){
-      filteredEmployees = filteredEmployees.filter((employe) => employe.name.toLocaleLowerCase().includes(searchBy.toLocaleLowerCase()))
-    }
-    
+    let filterSearchEmployees = this.filterArr(filterBy, this.searchArr(searchBy, data))
 
     return (
       <div className="app">
         <AppInfo employeesNumber={employeesNumber} increaseNumber={increaseArr} />
 
         <div className="search-panel">
-          <SearchPanel searchFilter={this.searchFilter} />
-          <AppFilter filterBy={filterBy} changeFilter={this.changeFilter} />
+          <SearchPanel searchEmployees={this.searchEmployees} />
+          <AppFilter filterBy={filterBy} filterEmployees={this.filterEmployees} />
         </div>
 
-        <EmployeesList data={filteredEmployees} onChange={this.onChange} onDelete={this.onDelete} />
+        <EmployeesList data={filterSearchEmployees} onChange={this.onChange} onDelete={this.onDelete} />
         <EmployeesAddForm addEmploye={this.addEmploye} />
       </div>
     );
